@@ -10,6 +10,7 @@ import (
 type SessionMaster struct {
 	isWebSocket bool
 	sessions sync.Map
+	keys sync.Map
 }
 
 func NewSessionMaster() *SessionMaster{
@@ -39,6 +40,19 @@ func (this *SessionMaster) GetSessionById(id uint32) *Session {
 func (this *SessionMaster) SetSession(fd uint32, conn *websocket.Conn) {
 	sess := NewSession(fd, conn)
 	this.sessions.Store(fd, sess)
+}
+
+func (this *SessionMaster) SetKey(sess *Session, key string) {
+	sess.SetKey(key)
+	this.keys.Store(key, sess.Id)
+}
+
+func (this *SessionMaster) getIdByKey(key string) uint32{
+	id, ok := this.keys.Load(key)
+	if !ok {
+		return 0
+	}
+	return id.(uint32)
 }
 
 func (this *SessionMaster) DelSessionById(id uint32) {
@@ -79,6 +93,14 @@ func (this *SessionMaster) SendById(id uint32, msg string) bool {
 
 	this.DelSessionById(id)
 	return false
+}
+
+func (this *SessionMaster) SendByKey(key string, msg string) bool {
+	id := this.getIdByKey(key)
+	if id == 0 {
+		return false
+	}
+	return this.SendById(id, msg)
 }
 
 

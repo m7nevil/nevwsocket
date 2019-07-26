@@ -38,8 +38,8 @@ func ListenAndServe(addr string) {
 	flag.Parse()
 	//log.SetFlags(0)
 	http.HandleFunc("/", handler)
+	//http.HandleFunc("/http", httpHandler)
 	log.Fatal(http.ListenAndServe(addr, nil))
-
 }
 
 func connHandler(sess *Session) {
@@ -62,7 +62,7 @@ func connHandler(sess *Session) {
 		var data map[string]interface{}
 		err = json.Unmarshal(msg, &data)
 		if err != nil {
-			log.Println(err)
+			log.Println("connHandler err:", err)
 			continue
 		}
 

@@ -11,6 +11,7 @@ type Session struct {
 	Conn  *websocket.Conn
 	times int64
 	lock  sync.Mutex
+	Key   string
 }
 
 func NewSession(id uint32, conn *websocket.Conn) *Session {
@@ -19,6 +20,10 @@ func NewSession(id uint32, conn *websocket.Conn) *Session {
 		Conn:  conn,
 		times: time.Now().Unix(),
 	}
+}
+
+func (this *Session) SetKey(key string){
+	this.Key = key
 }
 
 func (this *Session) write(msg string) error {
